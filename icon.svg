@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+<rect width="512" height="512" rx="112" fill="#141619"/>
+<rect x="0" y="430" width="30" height="82" fill="#E2442F"/><rect x="35" y="430" width="43" height="82" fill="#E39A0B"/><rect x="83" y="430" width="56" height="82" fill="#2952D1"/><rect x="144" y="430" width="32" height="82" fill="#0E9C88"/><rect x="181" y="430" width="45" height="82" fill="#6B4FD8"/><rect x="231" y="430" width="58" height="82" fill="#C13584"/><rect x="294" y="430" width="34" height="82" fill="#2E9B4F"/><rect x="333" y="430" width="47" height="82" fill="#F7C51E"/><rect x="385" y="430" width="60" height="82" fill="#E2442F"/><rect x="450" y="430" width="36" height="82" fill="#E39A0B"/><rect x="491" y="430" width="49" height="82" fill="#2952D1"/>
+<rect x="0" y="392" width="512" height="18" fill="#F7C51E"/>
+<circle cx="256" cy="226" r="128" fill="#F7C51E"/>
+<circle cx="256" cy="226" r="104" fill="none" stroke="#141619" stroke-width="16"/>
+<path d="M256 136 L284 226 L256 316 L228 226 Z" fill="#141619"/>
+<circle cx="256" cy="226" r="14" fill="#F7C51E"/>
+</svg>
