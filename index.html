@@ -185,6 +185,8 @@ section[data-tab] .seg button[aria-selected="true"]{background:var(--accent);col
 .hero .eyebrow,.hero h1{position:relative;color:#fff}
 .hero .eyebrow{opacity:.75}
 .hero h1{max-width:62%}
+.hero .byline{position:relative;margin:-8px 0 0;color:#fff;opacity:.9;font-size:13px;line-height:1.35;max-width:70%}
+.hero .byline b{color:var(--taxi);font-weight:700}
 .hero .search{position:relative;border-color:transparent;color:var(--ink)}
 .tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .tile{border:0;border-radius:15px;padding:12px;color:#fff;text-align:left;display:grid;gap:10px;cursor:pointer;min-height:92px;align-content:space-between;font:inherit;min-width:0}
@@ -1057,7 +1059,7 @@ const MINDMAPS = [{"id": "go", "title": "Getting around", "svg": "<svg xmlns=\"h
     const meal = t.min >= 360 && t.min < 690 ? "breakfast" : t.min < 1020 && t.min >= 690 ? "lunch" : "dinner";
     const sec = $("#tab-ask");
     sec.innerHTML = `
-      <div class="hero">${mosaic()}<p class="eyebrow">Barcelona · family guide</p><h1>Where to, family?</h1>
+      <div class="hero">${mosaic()}<p class="eyebrow">Barcelona · family guide</p><h1>Where to, family?</h1><p class="byline">Founded by <b>Dr. Cary Marlowe T. Remotigue</b></p>
       <form class="search" id="askForm" role="search" autocomplete="off">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
         <input id="q" type="search" placeholder="A place, a craving, a question…" aria-label="Search or ask">
