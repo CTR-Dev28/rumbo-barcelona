@@ -54,11 +54,28 @@ button,input,select{font:inherit;color:inherit}
 .brand small{display:block;font-family:var(--f-mono);font-size:11px;opacity:.75;letter-spacing:.04em;margin-top:3px;white-space:nowrap}
 .from{margin-left:auto;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:7px 12px;font-size:13px;max-width:52%;cursor:pointer}
 .from span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Appearance switch (Auto / Dark / Light), remembered per phone */
+.top .brand{flex:none}
+.top .from{min-width:0}
+.thm{flex:none;width:36px;height:36px;padding:0;display:grid;place-items:center;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:var(--roof-ink);cursor:pointer}
+.thm svg{width:18px;height:18px;display:block}
+.toast{position:fixed;left:50%;bottom:calc(var(--nav-h) + 18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:999px;font-size:13px;font-weight:600;box-shadow:var(--shadow);max-width:calc(100% - 32px);text-align:center;white-space:nowrap}
+:root[data-theme="light"]{color-scheme:light}
+/* Ask results + cravings */
+#live{display:grid;gap:12px;scroll-margin-top:calc(env(safe-area-inset-top,0px) + 76px)}
+#live:empty,#thread:empty{display:none}
+.crave{gap:10px}
+.crave h3{margin-top:2px}
+.crave .loc{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.02em;color:var(--muted);margin-top:4px}
+.crave .what{font-size:14px}
+.crave .tip{font-size:13px;color:var(--muted)}
+.season{display:inline-block;font-family:var(--f-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;border-radius:5px;padding:2px 6px;margin-left:8px;vertical-align:3px;background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
+.season.now{background:var(--taxi);color:var(--taxi-ink);border-color:transparent}
 
 main{padding-bottom:calc(var(--nav-h) + 28px + env(safe-area-inset-bottom,0px))}
 .credit{margin:28px 0 0;padding-top:14px;border-top:1px solid var(--line, rgba(128,128,128,.25));text-align:center;font-size:12px;line-height:1.55;opacity:.75}
 .credit b{font-weight:700;color:var(--ink)}
-section[data-tab]{padding-block:16px 8px;display:grid;gap:16px}
+section[data-tab]{padding-block:16px 8px;display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
 h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0}
 h1{font-stretch:112%;font-weight:850;font-size:clamp(26px,7vw,34px);line-height:1.02;letter-spacing:-.01em}
 h2{font-stretch:110%;font-weight:800;font-size:19px;line-height:1.15}
@@ -125,7 +142,7 @@ p{margin:0}
 .stat .s{font-size:12px;color:var(--muted);margin-top:2px}
 
 /* Results */
-.results{display:grid;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.results{display:grid;grid-template-columns:minmax(0,1fr);background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
 .row{display:flex;align-items:center;gap:12px;padding:11px 14px;border:0;border-top:1px solid var(--line);background:transparent;text-align:left;cursor:pointer;width:100%}
 .row:first-child{border-top:0}
 .row .ic{width:34px;height:34px;border-radius:10px;background:var(--c-cobalt);display:grid;place-items:center;flex:none}
@@ -303,6 +320,7 @@ ul.plain{margin:0;padding-left:18px;display:grid;gap:6px}
       <div><b>RUMBO</b><small id="clock">Barcelona</small></div>
     </div>
     <button class="from" id="fromBtn" aria-label="Change your starting point and group settings"><svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z" fill="currentColor"/></svg><span id="fromLabel">Plaça de Catalunya</span></button>
+    <button class="thm" id="themeBtn" type="button" aria-label="Appearance"></button>
   </div>
   <div class="mosaic-band" aria-hidden="true"></div>
 </header>
@@ -316,6 +334,8 @@ ul.plain{margin:0;padding-left:18px;display:grid;gap:6px}
   <section data-tab="more" id="tab-more" hidden></section>
   <p class="credit">Rumbo Barcelona · Founded by <b>Dr. Cary Marlowe T. Remotigue</b><br>© 2026 · SynthaSuite · All rights reserved</p>
 </main>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
 <nav class="tabs" aria-label="Sections"><div class="in" role="tablist">
   <button role="tab" data-go="ask" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>Ask</button>
@@ -388,6 +408,33 @@ const PLACES = [
     area: "Eixample, 10 min walk from Sagrada Família", addr: "Passeig de Sant Joan 82, Barcelona", lat: 41.3975, lng: 2.1716, metro: ["L4", "L5"], stop: "Verdaguer",
     order: "Pa amb tomàquet with jamón, Catalan and brunch plates, good coffee.",
     note: "Farmhouse-style room with a communal table; handy before a Sagrada Família slot.", price: "€€", hours: null, tags: "brunch coffee pa amb tomaquet sagrada" },
+
+  /* ---------- CRAVINGS PICKS (added 22 Oct 2026) ---------- */
+  { id: "sanroman", cat: "eat", meal: ["breakfast", "snack"], name: "Xurreria San Román", since: null, heritage: "Spanish classic",
+    area: "Gothic Quarter, Carrer dels Banys Nous", addr: "Carrer dels Banys Nous 8, Barcelona", lat: 41.3826, lng: 2.1749, metro: ["L3"], stop: "Liceu",
+    order: "Churros made by hand and fried to order, chocolate-dipped churros; porras (thick churros) at weekends and on holidays.",
+    note: "Small old-town xurreria making churros for over 50 years. Fried in peanut oil, so skip it if anyone has a peanut allergy.", price: "€", hours: null, hoursText: "Daily about 08:00–22:00 (Time Out; check)", checked: "22 Oct 2026", tags: "churros porras chocolate takeaway gothic" },
+  { id: "laietana", cat: "eat", meal: ["breakfast", "snack"], name: "Xurreria Laietana", since: null, heritage: "Spanish classic",
+    area: "Via Laietana, between Jaume I and Urquinaona", addr: "Via Laietana 46, Barcelona", lat: 41.3860, lng: 2.1771, metro: ["L4", "L1"], stop: "Jaume I / Urquinaona",
+    order: "Thin, crisp churros and porras with a cup of thick chocolate.",
+    note: "Classic family churreria that opens at 07:00 on weekdays, handy before the cathedral or an early sight.", price: "€",
+    hours: ["08:00-21:30", "07:00-21:30", "07:00-21:30", "07:00-21:30", "07:00-21:30", "07:00-21:30", "08:00-21:30"], checked: "22 Oct 2026", tags: "churros porras chocolate early breakfast" },
+  { id: "hofmann", cat: "eat", meal: ["breakfast", "snack"], name: "Pastisseria Hofmann", since: null, heritage: "Catalan pastry",
+    area: "El Born", addr: "Carrer dels Flassaders 44, Barcelona", lat: 41.3856, lng: 2.1810, metro: ["L4"], stop: "Jaume I",
+    order: "Croissants (plain, raspberry, marzipan, and the famous mascarpone one), cinnamon roll, macarons; panellets around 1 November.",
+    note: "The pastry shop of Barcelona's Hofmann cooking school.", price: "€€", hours: null, hoursText: "About Mon–Sat 09:00–14:00 & 15:30–20:00, Sun 09:00–14:30 (check)", checked: "22 Oct 2026", tags: "pastry croissant mascarpone bakery born sweet panellets" },
+  { id: "tomas", cat: "eat", meal: ["lunch", "dinner"], name: "Bar Tomás (Sarrià)", since: null, heritage: "Catalan bar",
+    area: "Sarrià, uptown", addr: "Carrer Major de Sarrià 49, Barcelona", lat: 41.3995, lng: 2.1214, metro: ["FGC"], stop: "Sarrià (S1/S2 from Pl. Catalunya)",
+    order: "Braves with their secret hot sauce and allioli, tuna empanadillas, anchovies.",
+    note: "The city's most famous patatas bravas. FGC train S1 or S2 from Plaça de Catalunya to Sarrià (about 15 min), then a 5-min walk. Phone 932 031 077.", price: "€", phone: "+34 932 031 077", hours: null, hoursText: "About 12:00–16:00 & 18:00–22:00, kitchen 13:00–16:00 (check)", checked: "22 Oct 2026", tags: "bravas patatas tapas sarria legend" },
+  { id: "paixano", cat: "eat", meal: ["lunch", "dinner"], name: "Can Paixano (La Xampanyeria)", since: null, heritage: "Catalan cava bar",
+    area: "Barceloneta edge, by Pla de Palau", addr: "Carrer de la Reina Cristina 7, Barcelona", lat: 41.3817, lng: 2.1838, metro: ["L4"], stop: "Barceloneta",
+    order: "House cava or rosat by the glass or bottle, sandwiches made to order on the grill, anchovies and cold tapas.",
+    note: "A lively old tavern with no chairs: everyone stands at the bar or the barrels. Cheap cava from the owners' own winery.", price: "€", hours: null, hoursText: "Mon–Sat about 09:00–22:30; closed Sunday (check)", checked: "22 Oct 2026", tags: "cava rosat sandwiches bocadillo xampanyeria standing" },
+  { id: "vicens", cat: "shop", name: "Torrons Vicens (Petritxol)", since: 1775, heritage: "Catalan",
+    area: "Gothic Quarter, Carrer de Petritxol", addr: "Carrer de Petritxol 15, Barcelona", lat: 41.3832, lng: 2.1734, metro: ["L3"], stop: "Liceu",
+    order: "Turrón (torró) in classic and new flavours, carquinyolis (almond biscuits), stone-ground chocolate.",
+    note: "Turrón makers from Agramunt since 1775. Bars travel well and make good gifts.", price: "€€", phone: "+34 93 304 37 36", hours: null, hoursText: "Old-town shop; hours not published, call +34 93 304 37 36", checked: "22 Oct 2026", tags: "turron torro nougat chocolate sweets gift petritxol" },
 
   /* ---------- LUNCH ---------- */
   { id: "culleretes", cat: "eat", meal: ["lunch", "dinner"], name: "Can Culleretes", since: 1786, heritage: "Catalan",
@@ -827,6 +874,94 @@ const EMERGENCY = [
 /* Opening hours checked 20 Oct 2026 from each venue's own website or the Barcelona
    City Council guide (guia.barcelona.cat); a few cafés from listing sites, marked "check".
    W(mon, tue, wed, thu, fri, sat, sun) -> app order Sun..Sat. "" closed; "25:30" = 01:30 next day. */
+/* Cravings & local specialties: dish -> where to get it (ids point at PLACES). Checked 22 Oct 2026.
+   season: ["MMDD", "MMDD"] inclusive (may wrap over New Year). re: case-insensitive pattern for the Ask box. */
+const CRAVINGS = [
+  { id: "churros", short: "Churros", icon: "cafe", color: "bg-coffee", name: "Churros & hot chocolate", local: "xurros amb xocolata · porras",
+    re: "churr|xurr|porras?\\b|hot choc|xocolat|chocolate con|suis\\b", maps: "churreria",
+    ids: ["sanroman", "laietana", "pallaresa", "dulcinea", "viader", "trebol", "argiles"],
+    what: "Crisp fried dough dipped in hot chocolate thick enough to hold a spoon. Locals have them for breakfast or the afternoon berenar.",
+    tip: "Sit down at the granjas on Carrer de Petritxol (La Pallaresa, Dulcinea) or Granja Viader (closed Sunday and Monday). Fried to order: Xurreria San Román, or Xurreria Laietana from 07:00. Late on weekend nights: Churreria J. Argilés." },
+  { id: "paella", short: "Paella", icon: "bowl", color: "bg-saffron", name: "Paella & rice dishes", local: "paella · arròs negre · fideuà",
+    re: "paella|arr[oò]s|arroz|\\brice\\b|fideu|black rice", maps: "paella restaurant",
+    ids: ["7portes", "cansole", "escribaxiri", "pescadors"],
+    what: "Seafood rice cooked in a wide pan. Arròs negre is black with squid ink; fideuà swaps the rice for short noodles. Here it is a lunch dish, usually ordered for two or more.",
+    tip: "7 Portes serves all day, 13:00–24:00, and its Paella Parellada comes already peeled, easy for kids. Can Solé is the Barceloneta classic; Xiringuito Escribà has the sea view. Skip places with paella photos on boards outside." },
+  { id: "tapas", short: "Tapas", icon: "fork", color: "bg-tomato", name: "Tapas, montaditos & croquetes", local: "tapes · montaditos · croquetes",
+    re: "\\btapa|montadit|pintxo|small plates|croquet|tortilla|padr[oó]n", maps: "tapas bar",
+    ids: ["catalana", "condal", "calpep", "xampanyet", "quimet", "canete", "nacional"],
+    what: "Small plates to share: croquetes, patatas bravas, Padrón peppers, tortilla, grilled squid, anchovies, and montaditos (bites on bread).",
+    tip: "Cervecería Catalana is busy all day, so put your name down at the door. Quimet & Quimet in Poble-sec is tiny, standing-only and weekdays only. Tapas bars fill from 19:30." },
+  { id: "bravas", short: "Bravas", icon: "fork", color: "bg-tomato", name: "Patatas bravas", local: "braves",
+    re: "brava|\\bbraves\\b", maps: "patatas bravas",
+    ids: ["tomas", "catalana", "condal"],
+    what: "Fried potato chunks with a spicy sauce and garlicky allioli: the city's favourite bar snack.",
+    tip: "The legend is Bar Tomás in Sarrià: FGC train S1 or S2 from Plaça de Catalunya to Sarrià, about 15 minutes. In the centre, Cervecería Catalana and Ciudad Condal are reliable." },
+  { id: "bomba", short: "La bomba", icon: "fork", color: "bg-magenta", name: "La bomba", local: "bomba de la Barceloneta",
+    re: "\\bbombas?\\b", maps: "bomba barceloneta",
+    ids: ["covafumada"],
+    what: "A fist-sized ball of mashed potato around spiced meat, fried and topped with allioli and hot sauce. It was created at La Cova Fumada in Barceloneta.",
+    tip: "La Cova Fumada has no sign on the door and lunch-led hours, so arrive early. Barceloneta metro (L4), then about 10 minutes on foot." },
+  { id: "jamon", short: "Jamón", icon: "fork", color: "bg-magenta", name: "Jamón ibérico & fuet", local: "pernil ibèric · fuet",
+    re: "jam[oó]n|\\bham\\b|iberic|pernil|charcuter|embutido|chorizo|\\bfuet\\b", maps: "jamón ibérico shop",
+    ids: ["boqueria", "nacional", "petitbo"],
+    what: "Acorn-fed Iberian ham, carved paper-thin; also try fuet, the thin Catalan dry sausage.",
+    tip: "In La Boqueria (closed Sundays) stalls sell sliced ham in paper cones to eat as you walk. Vacuum packs travel well, but check your home country's rules on bringing meat." },
+  { id: "patomaquet", short: "Pa amb tomàquet", icon: "sunrise", color: "bg-tomato", name: "Pa amb tomàquet", local: "pan con tomate",
+    re: "pa amb|tom[aà]quet|pan con tomate|tomato bread", maps: "pa amb tomàquet",
+    ids: ["petitbo"],
+    what: "Toasted country bread rubbed with ripe tomato, olive oil and salt. It comes with almost every Catalan meal, often with ham on top.",
+    tip: "Order it alongside anything; Granja Petitbo serves it with jamón at breakfast." },
+  { id: "desserts", short: "Crema catalana", icon: "cafe", color: "bg-violet", name: "Crema catalana & Catalan desserts", local: "crema catalana · mel i mató",
+    re: "crema catalana|cremada|custard|\\bmat[oó]\\b|mel i|dessert|postre", maps: "crema catalana",
+    ids: ["viader", "culleretes"],
+    what: "Crema catalana is a cinnamon-and-lemon custard under a crackling burnt-sugar top. Mel i mató is fresh curd cheese with honey.",
+    tip: "Granja Viader serves both (closed Sunday and Monday); Can Culleretes ends a Catalan lunch with crema catalana." },
+  { id: "pastries", short: "Pastries", icon: "store", color: "bg-saffron", name: "Pastries: xuixo, ensaïmada & croissants", local: "xuixo · ensaïmada · croissant",
+    re: "xuixo|xuxo|ensa[iï]mada|croissant|pastr|pastis|bakery|\\bforn\\b|\\bcakes?\\b|sweets?\\b|dol[cç]|dulce|cinnamon|pastel|something sweet", maps: "pastisseria",
+    ids: ["escriba", "hofmann", "dulcinea", "trebol", "caelum"],
+    what: "A xuixo is a cream-filled fried pastry rolled in sugar, from Girona; an ensaïmada is a spiral of sweet bread from Mallorca dusted with icing sugar.",
+    tip: "Escribà bakes in a modernista shopfront on La Rambla; Hofmann in El Born makes the city's most talked-about croissants; Caelum sells sweets made in Spanish convents." },
+  { id: "turron", short: "Turrón", icon: "bag", color: "bg-violet", name: "Turrón (torró)", local: "torró · turrón",
+    re: "turr[oó]n|\\btorr[oó]n?s?\\b|nougat|marzipan|massap", maps: "turrón",
+    ids: ["vicens"],
+    what: "Almond nougat, either hard with whole almonds or soft and ground, in many flavours. The Christmas sweet, and a good gift to take home.",
+    tip: "Torrons Vicens on Carrer de Petritxol, the chocolate street, has been making it since 1775. Solid bars are fine in hand luggage." },
+  { id: "castanyada", short: "Panellets & chestnuts", icon: "star", color: "bg-coffee", name: "Castanyada: panellets & roasted chestnuts", local: "castanyes · panellets · moniatos",
+    season: ["1015", "1105"], seasonLabel: "31 Oct–1 Nov",
+    re: "panellet|castany|chestnut|casta[nñ]as?\\b|moniato|boniato|sweet potato|all saints|tots sants", maps: "pastisseria panellets",
+    ids: ["escriba", "hofmann"],
+    what: "Catalonia's autumn feast on 31 October and All Saints' Day (1 November): roasted chestnuts and sweet potatoes from street stalls, and panellets, small marzipan balls rolled in pine nuts, from pastry shops.",
+    tip: "Look for chestnut stalls around Plaça de Catalunya and in the old town. 1 November is a public holiday with most shops closed, so buy panellets by the 31st." },
+  { id: "cava", short: "Cava & vermut", icon: "star", color: "bg-teal", name: "Cava & vermut", local: "cava · vermut",
+    re: "\\bcava\\b|bubbl|sparkl|champagne|xampan|verm[uo]|aperitiu|aperitivo", maps: "cava bar",
+    ids: ["paixano", "xampanyet", "quimet"],
+    what: "Cava is Catalonia's sparkling wine, from the Penedès just west of the city. Vermut is the noon aperitif, on ice with an olive and a slice of orange.",
+    tip: "Can Paixano is standing room only, with cheap cava and grilled sandwiches (closed Sunday). El Xampanyet in El Born pairs cava with anchovies; Quimet & Quimet (weekdays) is the vermut classic. No drinking in the street: fines." },
+  { id: "seafood", short: "Seafood", icon: "wave", color: "bg-teal", name: "Seafood & fish", local: "marisc · peix",
+    re: "seafood|marisc|shellfish|octopus|pulpo|\\bpop\\b|prawn|gamba|lobster|llagost|langost|\\bfish\\b|squid|calamar|clams|mussel|anchov|anxov|sardin", maps: "seafood restaurant",
+    ids: ["calpep", "botafumeiro", "cansole", "quim", "pescadors", "canete"],
+    what: "Grilled prawns, squid, clams, octopus and fried fish. Anchovies from L'Escala on the Costa Brava are a Catalan pride.",
+    tip: "Cal Pep's counter is the classic (counter seats first come). Botafumeiro in Gràcia is the special-occasion Galician seafood house. El Quim in La Boqueria does fried eggs with baby squid." },
+  { id: "catalan", short: "Catalan classics", icon: "bowl", color: "bg-green", name: "Catalan home cooking", local: "cuina catalana",
+    re: "catalan (food|cuisine|dish|cooking|classic)|canelon|cannelloni|escudella|botifarra|butifarra|fricand|suquet|home cooking|\\bstew\\b", maps: "cuina catalana",
+    ids: ["culleretes", "7portes"],
+    what: "Canelons (Catalan cannelloni), escudella stew, botifarra sausage with white beans, chicken with prunes and pine nuts, and suquet fish stew.",
+    tip: "Can Culleretes (1786) is Catalonia's oldest restaurant; 7 Portes (1836) adds the rice dishes. A weekday menú del dia at lunch is the best value." },
+  { id: "calcots", short: "Calçots", icon: "fork", color: "bg-green", name: "Calçots", local: "calçotada",
+    season: ["1101", "0430"], seasonLabel: "Nov–Apr",
+    re: "cal[cç]ot", maps: "calçots",
+    ids: [],
+    what: "Sweet spring onions charred over a fire, peeled by hand and dipped in romesco sauce, usually as a long lunch called a calçotada.",
+    tip: "The season runs about November to April and peaks in late winter. In the city, Bodega Joan (Carrer del Rosselló 164) and Can Vador (Carrer de la Diputació 367) serve them in season; call first." },
+  { id: "coffee", short: "Coffee", icon: "cafe", color: "bg-coffee", name: "Specialty coffee", local: "tallat · cafè amb llet",
+    re: "coffee|\\bcaf[eè]\\b|espresso|latte|flat white|cortado|tallat|cappuccino|barista", maps: "specialty coffee",
+    ids: ["petitnomad", "nomadsert", "satans", "hidden", "threemarks"],
+    what: "Order a tallat (cortado) or cafè amb llet. The city's specialty roasters serve light-roast single origins.",
+    tip: "Nomad is the best-known local roaster, with three spots in the guide; Satan's Coffee Corner hides in El Call. More in Eat › Cafés." }
+];
+const MUSTEAT_RE = "local (food|dish|special|delicac|eat)|delicac|specialit|typical (food|dish|spanish|catalan)|traditional (food|dish)|must.?eat|famous (food|dish)|what (to|should|can|do) (we |i )?eat|foodie|signature dish|craving|street food|catalan food|spanish food|food to try|try in barcelona|best food";
+
 const HOURS_PATCH = {
   viader: { hours: W("", "09:00-13:30,17:00-20:30", "09:00-13:30,17:00-20:30", "09:00-13:30,17:00-20:30", "09:00-13:30,17:00-20:30", "09:00-13:30,17:00-20:30", ""), hoursNote: "Closed Sunday and Monday." },
   dulcinea: { hours: ALL("09:00-13:00,16:30-20:30"), hoursNote: "Closes for lunch. Closed all of July." },
@@ -1052,11 +1187,43 @@ const MINDMAPS = [{"id": "go", "title": "Getting around", "svg": "<svg xmlns=\"h
 
   /* ---------------- settings (per-viewer, localStorage) ---------------- */
   const KEY = "rumbo.v1";
-  const defaults = { hub: "catalunya", gps: null, party: 4, luggage: false, hotel: "", tab: "ask", eat: null, see: "must", mz: "city", fam: "places", tf: "all", active: "run", more: "maps", mm: "go", mmFit: false, fast: true };
+  const defaults = { hub: "catalunya", gps: null, party: 4, luggage: false, hotel: "", tab: "ask", eat: null, see: "must", mz: "city", fam: "places", tf: "all", active: "run", more: "maps", mm: "go", mmFit: false, fast: true, theme: "auto" };
   let S = Object.assign({}, defaults);
   try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch (e) {}
   if (S.seeNew !== "2026-10-22") { S.see = "must"; S.seeNew = "2026-10-22"; } // open the new Must-see tab once
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+
+  /* ---------------- appearance: auto / dark / light (per phone) ---------------- */
+  const THEMES = { auto: "Auto: follows your phone", dark: "Dark mode", light: "Light mode" };
+  const THEME_NEXT = { auto: "dark", dark: "light", light: "auto" };
+  const THEME_IC = {
+    auto: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg>',
+    dark: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.6A8.2 8.2 0 0 1 9.4 4a8.2 8.2 0 1 0 10.6 10.6z" fill="currentColor"/></svg>',
+    light: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="currentColor"/><path d="M12 2.5V5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'
+  };
+  const rootEl = document.documentElement;
+  let hostTheme = rootEl.getAttribute("data-theme"); // set by the Claude app; empty in the installed app
+  if (!THEMES[S.theme]) S.theme = "auto";
+  function applyTheme() {
+    if (S.theme === "auto") { if (hostTheme) rootEl.setAttribute("data-theme", hostTheme); else rootEl.removeAttribute("data-theme"); }
+    else rootEl.setAttribute("data-theme", S.theme);
+    const b = document.getElementById("themeBtn");
+    if (b) { b.innerHTML = THEME_IC[S.theme]; b.title = THEMES[S.theme]; b.setAttribute("aria-label", "Appearance: " + THEMES[S.theme] + ". Tap to change."); }
+  }
+  try {
+    new MutationObserver(() => {
+      const v = rootEl.getAttribute("data-theme");
+      if (S.theme === "auto") { hostTheme = v; return; }
+      if (v !== S.theme) { hostTheme = v; applyTheme(); }
+    }).observe(rootEl, { attributes: true, attributeFilter: ["data-theme"] });
+  } catch (e) {}
+  let toastT = 0;
+  function toast(msg) {
+    const t = document.getElementById("toast"); if (!t) return;
+    t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, 2200);
+  }
+  applyTheme();
+  { const tb = document.getElementById("themeBtn"); if (tb) tb.addEventListener("click", () => { S.theme = THEME_NEXT[S.theme] || "auto"; save(); applyTheme(); toast(THEMES[S.theme]); }); }
 
   /* ---------------- time in Barcelona ---------------- */
   function madrid(date) {
@@ -1365,7 +1532,7 @@ const MINDMAPS = [{"id": "go", "title": "Getting around", "svg": "<svg xmlns=\"h
   /* ---------------- header ---------------- */
   function renderHeader() {
     const t = madrid();
-    $("#clock").textContent = `${t.hm} · ${DAYS[t.dow]} ${t.d} ${MONTHS[t.m - 1]} · BCN`;
+    $("#clock").textContent = `${t.hm} · ${DAYS[t.dow]} ${t.d} ${MONTHS[t.m - 1]}`;
     $("#fromLabel").textContent = S.gps ? "My location" : origin().name;
   }
   $("#fromBtn").addEventListener("click", settingsSheet);
@@ -1431,7 +1598,7 @@ const MINDMAPS = [{"id": "go", "title": "Getting around", "svg": "<svg xmlns=\"h
   /* ---------------- ASK ---------------- */
   let sample = null, sampleChecked = false, thread = [], ctl = null;
   const SUGGEST = [
-    "Breakfast near us right now", "Best paella for lunch today", "Where can I rent a carbon road bike?", "An easy 10 km run from Barceloneta",
+    "Best churros near us?", "What local food should we try?", "Breakfast near us right now", "Best paella for lunch today", "Where can I rent a carbon road bike?", "An easy 10 km run from Barceloneta",
     "How do we get to Montserrat tomorrow?", "Airport to our hotel with luggage", "Specialty coffee near Plaça de Catalunya", "Where to watch Barça tonight?", "Rainy-day plan with kids", "Top must-sees for a first visit", "Kid-friendly tours and classes", "Pharmacy open now", "Supermarket open on Sunday", "Where to buy espadrilles?"
   ];
   function renderAsk() {
@@ -1447,6 +1614,12 @@ const MINDMAPS = [{"id": "go", "title": "Getting around", "svg": "<svg xmlns=\"h
         <input id="q" type="search" placeholder="A place, a craving, a question…" aria-label="Search or ask">
         <button class="btn taxi" type="submit" id="askBtn">Ask</button>
       </form></div>
+      <div id="live"></div>
+      <div class="thread" id="thread"></div>
+      <div class="askbar" id="aiBar" hidden><span class="small muted">Answer style</span>
+        <div class="seg" role="tablist" style="flex:1;max-width:260px"><button role="tab" id="fastBtn" aria-selected="${S.fast}">Quick</button><button role="tab" id="deepBtn" aria-selected="${!S.fast}">Thorough</button></div>
+        <button class="btn ghost sm" id="stopBtn" hidden>Stop</button><button class="btn ghost sm" id="clearBtn" hidden>New question</button></div>
+      <p class="small muted" id="aiNote"></p>
       <div class="tiles">
         <button class="tile bg-tomato" data-tile="eat">${ic(meal === "breakfast" ? "sunrise" : meal === "lunch" ? "bowl" : "fork")}<span><b>Eat now</b><small>${meal[0].toUpperCase() + meal.slice(1)} picks</small></span></button>
         <button class="tile bg-taxi" data-tile="go">${ic("taxi")}<span><b>Ride</b><small>Taxi · metro · walk</small></span></button>
@@ -1459,12 +1632,6 @@ const MINDMAPS = [{"id": "go", "title": "Getting around", "svg": "<svg xmlns=\"h
       ${needsRow()}
       ${sosStrip()}
       <div class="chips" id="sugg">${SUGGEST.map((x) => `<button class="chip" type="button" data-q="${esc(x)}">${esc(x)}</button>`).join("")}</div>
-      <div id="live"></div>
-      <div class="thread" id="thread"></div>
-      <div class="askbar" id="aiBar" hidden><span class="small muted">Answer style</span>
-        <div class="seg" role="tablist" style="flex:1;max-width:260px"><button role="tab" id="fastBtn" aria-selected="${S.fast}">Quick</button><button role="tab" id="deepBtn" aria-selected="${!S.fast}">Thorough</button></div>
-        <button class="btn ghost sm" id="stopBtn" hidden>Stop</button><button class="btn ghost sm" id="clearBtn" hidden>New question</button></div>
-      <p class="small muted" id="aiNote"></p>
       <div class="today">
         <div class="stat"><div class="k">Metro</div><div class="v">${mt.v}</div><div class="s">${mt.s}</div></div>
         <div class="stat"><div class="k">Sunrise</div><div class="v">≈${fmtHM(s.rise)}</div><div class="s">sunset ≈${fmtHM(s.set)}</div></div>
@@ -1533,6 +1700,54 @@ const MINDMAPS = [{"id": "go", "title": "Getting around", "svg": "<svg xmlns=\"h
     return `<svg class="mosaic" viewBox="0 0 300 230" aria-hidden="true">${out}</svg>`;
   }
 
+  /* ---------------- cravings & local specialties ---------------- */
+  const CRAVE_RX = CRAVINGS.map((c) => [c, new RegExp(c.re, "i")]);
+  const MUSTEAT_RX = new RegExp(MUSTEAT_RE, "i");
+  function inSeason(c, t) {
+    if (!c.season) return true;
+    const x = t.iso.slice(5, 7) + t.iso.slice(8, 10), [a, b] = c.season;
+    return a <= b ? x >= a && x <= b : x >= a || x <= b;
+  }
+  function seasonBadge(c, t) {
+    if (!c.season) return "";
+    return inSeason(c, t) ? `<span class="season now">In season · ${esc(c.seasonLabel)}</span>` : `<span class="season off">${esc(c.seasonLabel)} only</span>`;
+  }
+  function matchCravings(raw) { return CRAVE_RX.filter(([, rx]) => rx.test(raw)).map(([c]) => c); }
+  function craveOrder(t) { const r = (c) => (c.season ? (inSeason(c, t) ? 0 : 2) : 1); return CRAVINGS.slice().sort((a, b) => r(a) - r(b)); }
+  function craveCard(c) {
+    const t = madrid();
+    const rank = (p) => { const s = status(p, t).state; return s === "open" ? 0 : s === "unknown" ? 1 : 2; };
+    const ps = c.ids.map((id) => byId[id]).filter(Boolean).map((p, i) => ({ p, i })).sort((a, b) => rank(a.p) - rank(b.p) || a.i - b.i).map((x) => x.p);
+    const rows = ps.map((p) => `<button class="row" data-pid="${p.id}">${rowIc(p)}<span class="t"><b>${esc(p.name)}</b><span>${esc(status(p, t).text)} · ${esc(p.area || "")}</span></span><span class="d">${distTxt(p)}</span></button>`).join("");
+    const near = `<a class="row" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.maps + " near me")}" target="_blank" rel="noopener"><span class="ic bg-green">${ic("pin")}</span><span class="t"><b>More near you on Google Maps</b><span>Live hours and reviews</span></span></a>`;
+    return `<div class="card crave"><div><p class="eyebrow">Craving · local food</p><h3>${esc(c.name)}${seasonBadge(c, t)}</h3><p class="loc">${esc(c.local)}</p></div>
+      <p class="what">${esc(c.what)}</p>
+      <div class="results">${rows}${near}</div>
+      <p class="tip">${esc(c.tip)}</p></div>`;
+  }
+  function mustEatCard() {
+    const t = madrid();
+    const rows = craveOrder(t).map((c) => `<button class="row" data-crave="${c.id}"><span class="ic ${c.color}" aria-hidden="true">${ic(c.icon)}</span><span class="t"><b>${esc(c.name)}</b><span>${esc(c.local)}</span></span><span class="d">${c.season ? (inSeason(c, t) ? "Now" : esc(c.seasonLabel)) : "›"}</span></button>`).join("");
+    return `<div class="card crave"><div><p class="eyebrow">Local food</p><h3>Must-eat in Barcelona</h3></div><p class="what">Tap a dish to see what it is and where to get it, with today's hours.</p><div class="results">${rows}</div></div>`;
+  }
+  function craveChips() {
+    const t = madrid();
+    return craveOrder(t).map((c) => `<button class="chip" type="button" data-crave="${c.id}">${esc(c.short)}${c.season && inSeason(c, t) ? " · now" : ""}</button>`).join("");
+  }
+  function craveSheet(id) {
+    const c = CRAVINGS.find((x) => x.id === id); if (!c) return;
+    openSheet(c.name, craveCard(c));
+    $$("#sheetBody [data-pid]").forEach((b) => b.addEventListener("click", () => openPlace(b.dataset.pid)));
+  }
+  function craveCtx() {
+    const t = madrid();
+    return "LOCAL FOOD & CRAVINGS (dish: where to get it, names from the guide list):\n" + CRAVINGS.map((c) => `- ${c.name} (${c.local})${c.season ? (inSeason(c, t) ? " [in season now]" : " [out of season; " + c.seasonLabel + "]") : ""}: ${c.ids.map((id) => byId[id] && byId[id].name).filter(Boolean).join("; ") || "no guide pick"}. ${c.tip}`).join("\n");
+  }
+  function scrollLive() {
+    const b = $("#live"); if (!b || !b.firstElementChild) return;
+    try { b.scrollIntoView({ behavior: "smooth", block: "start" }); } catch (e) { b.scrollIntoView(); }
+  }
+
   /* local search */
   const SYN = [
     [/breakfast|desayuno|esmorzar|churro|chocolate|morning/i, (p) => p.meal && p.meal.includes("breakfast")],
@@ -1570,20 +1785,28 @@ const MINDMAPS = [{"id": "go", "title": "Getting around", "svg": "<svg xmlns=\"h
     raw = raw.trim();
     if (raw.length < 2) { box.innerHTML = ""; return; }
     const words = norm(raw).split(/\s+/).filter((w) => w.length > 2 && !["the", "and", "for", "near", "with", "best", "where", "what", "how", "our", "can"].includes(w));
-    const hits = PLACES.map((p) => ({ p, s: score(p, words, raw) + (norm(p.name).includes(norm(raw)) ? 10 : 0) })).filter((x) => x.s > 3)
+    let hits = PLACES.map((p) => ({ p, s: score(p, words, raw) + (norm(p.name).includes(norm(raw)) ? 10 : 0) })).filter((x) => x.s > 3)
       .sort((a, b) => b.s - a.s || km(origin(), a.p) - km(origin(), b.p)).slice(0, 6);
     const rhits = ROUTES.filter((r) => words.some((w) => norm(r.name + " " + r.what).includes(w)) || (/run|jog|exercise|workout/i.test(raw) && r.sport !== "ride") || (/ride|cycl|bike/i.test(raw) && r.sport !== "run")).slice(0, 3);
-    let extra = "";
+    let extra = "", cards = "";
+    const cr = matchCravings(raw).slice(0, 2);
+    if (cr.length) {
+      const shown = new Set(cr.flatMap((c) => c.ids));
+      hits = hits.filter((h) => !shown.has(h.p.id) && h.s >= 8).slice(0, 3);
+      cards = cr.map(craveCard).join("");
+    }
+    if (MUSTEAT_RX.test(raw)) cards += mustEatCard();
     if (/airport|aeropuerto|aeroport|flight/i.test(raw)) extra += `<button class="row" data-pid="__airport"><span class="ic bg-saffron">${ic("plane")}</span><span class="t"><b>Getting to and from the airport</b><span>Aerobús · L9 Sud · R2 Nord · taxi</span></span></button>`;
     if (/supermarket|grocer|super |food shop|convenience|24 ?h|late night|mercadona|condis|carrefour|supercor|pharm|farm[aà]c|chemist|drugstore/i.test(raw)) extra += `<a class="row" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((/pharm|farm|chemist|drug/i.test(raw) ? "pharmacy" : /convenience|24 ?h|late/i.test(raw) ? "convenience store" : "supermarket") + " near me")}" target="_blank" rel="noopener"><span class="ic bg-green">${ic(/pharm|farm|chemist|drug/i.test(raw) ? "cross" : "cart")}</span><span class="t"><b>Open Google Maps near you</b><span>Live hours for the nearest ones</span></span></a>`;
     if (/emergenc|ambulance|hospital|police|stolen|robbed|help|sos|112|fire/i.test(raw)) extra += `<button class="row" data-gohelp="1"><span class="ic bg-tomato">${ic("sos")}</span><span class="t"><b>Emergency: call 112</b><span>Hospitals, police and numbers</span></span></button>`;
     if (/barça|barca|yamal|match|fixture|football/i.test(raw)) extra += `<button class="row" data-gosee="barca"><span class="ic bg-barca">${ic("ball")}</span><span class="t"><b>Barça fixtures & tickets</b><span>Next: ${esc((nextFixture(madrid()) || {}).home || "")} v ${esc((nextFixture(madrid()) || {}).away || "")}</span></span></button>`;
     if (/must.?see|top (10|ten|sights)|highlights|first (time|visit)|famous|landmarks?|tourist/i.test(raw)) extra += `<button class="row" data-gosee="must"><span class="ic bg-saffron">${ic("star")}</span><span class="t"><b>Must-see ranking</b><span>Top ${MUSTSEE.filter((m) => m.zone === "city").length} in the city · ${MUSTSEE.filter((m) => m.zone === "region").length} around ${esc(REGION.area)}</span></span></button>`;
     if (/tour|guided|workshop|class|viator|mosaic|cooking|sail|kids|children|family/i.test(raw)) extra += `<button class="row" data-gosee="family" data-fam="tours"><span class="ic bg-violet">${ic("ticket")}</span><span class="t"><b>Family tours & classes</b><span>${TOURS.length} bookable picks, with the direct price where cheaper</span></span></button>`;
-    if (!hits.length && !rhits.length && !extra) { box.innerHTML = `<p class="small muted">No match in the guide yet — press Ask for a full answer.</p>`; return; }
-    box.innerHTML = `<div class="results">${extra}${hits.map(({ p }) => { const st = status(p); return `<button class="row" data-pid="${p.id}">${rowIc(p)}<span class="t"><b>${esc(p.name)}</b><span>${esc(st.text)} · ${esc(p.area || "")}</span></span><span class="d">${distTxt(p)}</span></button>`; }).join("")}
-      ${rhits.map((r) => `<button class="row" data-route="${r.id}"><span class="ic bg-green">${ic(r.sport === "ride" ? "bike" : "run")}</span><span class="t"><b>${esc(r.name)}</b><span>${esc(r.km)} · ${esc(r.level)}</span></span></button>`).join("")}</div>`;
+    if (!cards && !hits.length && !rhits.length && !extra) { box.innerHTML = `<p class="small muted">No match in the guide yet — press Ask for a full answer.</p>`; return; }
+    box.innerHTML = cards + (extra || hits.length || rhits.length ? `<div class="results">${extra}${hits.map(({ p }) => { const st = status(p); return `<button class="row" data-pid="${p.id}">${rowIc(p)}<span class="t"><b>${esc(p.name)}</b><span>${esc(st.text)} · ${esc(p.area || "")}</span></span><span class="d">${distTxt(p)}</span></button>`; }).join("")}
+      ${rhits.map((r) => `<button class="row" data-route="${r.id}"><span class="ic bg-green">${ic(r.sport === "ride" ? "bike" : "run")}</span><span class="t"><b>${esc(r.name)}</b><span>${esc(r.km)} · ${esc(r.level)}</span></span></button>`).join("")}</div>` : "");
     box.querySelectorAll("[data-pid]").forEach((b) => b.addEventListener("click", () => openPlace(b.dataset.pid)));
+    box.querySelectorAll("[data-crave]").forEach((b) => b.addEventListener("click", () => { const c = CRAVINGS.find((x) => x.id === b.dataset.crave); if (!c) return; const qq = $("#q"); if (qq) qq.value = c.name; liveSearch(c.name); scrollLive(); }));
     box.querySelectorAll("[data-gosee]").forEach((b) => b.addEventListener("click", () => { S.see = b.dataset.gosee; if (b.dataset.fam) S.fam = b.dataset.fam; setTab("see"); }));
     box.querySelectorAll("[data-gohelp]").forEach((b) => b.addEventListener("click", () => { S.more = "help"; save(); setTab("more"); }));
   }
@@ -1611,7 +1834,7 @@ const MINDMAPS = [{"id": "go", "title": "Getting around", "svg": "<svg xmlns=\"h
 Now: ${DAYS[t.dow]} ${t.d} ${MONTHS[t.m - 1]} ${t.y}, ${t.hm} Barcelona time. Sunrise ${fmtHM(sn.rise)}, sunset ${fmtHM(sn.set)}. Metro: ${metroText(t).v} (${metroText(t).s}).
 They are near: ${o.name}. Group of ${S.party}${S.luggage ? ", carrying luggage/stroller" : ""}.${S.hotel ? " Hotel: " + S.hotel + "." : ""}
 
-ANSWER RULES: Reply in under 150 words, plain text, no headings or tables; up to 5 short bullets with "•" are fine. Lead with the recommendation. Prefer places from the guide list and use their names exactly. If you suggest somewhere not in the list, say "check hours first". Always say how to get there: walk, metro line, bus, taxi or train, with rough time and cost for the group (single ticket €2.90 each; taxi €2.80 flag + €1.35/km weekdays 08–20, €1.66/km nights/weekends/holidays; airport +€4.60, min €21 from airport). Don't send them somewhere that is closed now unless they ask about later. Respect the alerts. Spanish meal times: lunch 13:30–16:00, dinner 20:30–23:00. Never invent prices, hours or match times beyond what is given.
+ANSWER RULES: Reply in under 150 words, plain text, no headings or tables; up to 5 short bullets with "•" are fine. Lead with the recommendation. Prefer places from the guide list and use their names exactly. If you suggest somewhere not in the list, say "check hours first". Always say how to get there: walk, metro line, bus, taxi or train, with rough time and cost for the group (single ticket €2.90 each; taxi €2.80 flag + €1.35/km weekdays 08–20, €1.66/km nights/weekends/holidays; airport +€4.60, min €21 from airport). Don't send them somewhere that is closed now unless they ask about later. Respect the alerts. Spanish meal times: lunch 13:30–16:00, dinner 20:30–23:00. Never invent prices, hours or match times beyond what is given. For a food craving or a "local food" question, name 2–3 places from LOCAL FOOD & CRAVINGS (open ones first) and how to get there.
 
 ALERTS:
 ${al || "- none"}
@@ -1621,6 +1844,8 @@ TRANSPORT: Metro Mon–Thu & Sun 05:00–24:00, Fri 05:00–02:00, Sat all night
 RULES: Carry passport/ID. No drinking alcohol in the street (fines). No swimwear away from the beach (fines €120–300). Shops closed on Sundays until 29 Nov except Maremagnum and La Roca Village. EVERYDAY NEEDS: 24-hour pharmacies: Farmàcia Torres, Carrer d'Aribau 62 (Eixample) and Farmàcia Clapés, La Rambla 98 (opposite the Boqueria). Other pharmacies (green cross) are usually open about 09:00–21:00; the on-duty pharmacy is shown on every pharmacy door and at farmaguia.net (official, Col·legi de Farmacèutics). Many medicines need a prescription in Spain. Supermarkets: Mercadona Mon–Sat 09:00–21:30, closed Sundays and holidays; Bonpreu Mon–Sat 09:00–21:00, closed Sundays; on Sundays try Condis (many open daily, about 09:00–23:00), Carrefour Express or Supercor (El Corte Inglés). Hours vary by branch, so say "check on Google Maps". EMERGENCIES: always tell them to call 112 first for anything urgent or life-threatening (ambulance, fire, police; free, English spoken). 061 = health advice line. Tourist police help with interpreters: Guàrdia Urbana Tourist Assistance, La Rambla 43, tel 932 562 431. For thefts, report at a police station (denúncia), cancel cards, consulate for passports. Hospitals and police are in the guide list; for children, Hospital Sant Joan de Déu. You are not a doctor: for medical questions give the right place to go, not a diagnosis. Tourist tax €6–12 per adult per night, under-17s free, max 7 nights. Emergencies 112.
 
 ${seeCtx()}
+
+${craveCtx()}
 
 FC BARCELONA (Lamine Yamal's team, coach Hansi Flick). Fixtures, Barcelona time (may change; tickets only via fcbarcelona.com):
 ${fx}
@@ -1634,12 +1859,12 @@ ${lines}`;
   }
   async function ask(question) {
     const q = $("#q");
-    if (!sample) { liveSearch(question); $("#aiNote").textContent = sampleChecked ? "Showing guide matches. Full answers work when this app is opened inside Claude." : "Connecting…"; return; }
+    if (!sample) { liveSearch(question); q.blur(); scrollLive(); $("#aiNote").textContent = sampleChecked ? "Showing guide matches. Full answers work when this app is opened inside Claude." : "Connecting…"; return; }
     if (ctl) ctl.abort();
     thread.push({ role: "user", content: question });
     thread.push({ role: "assistant", content: "", pending: true });
     drawThread();
-    q.value = ""; liveSearch(question);
+    q.value = ""; liveSearch(question); q.blur(); scrollLive();
     const turns = [{ role: "user", content: context() }];
     thread.slice(-7, -1).forEach((m) => { if (m.content && !m.failed) turns.push({ role: m.role, content: m.content }); });
     // ensure alternation ends on user
@@ -1756,11 +1981,14 @@ ${lines}`;
     const list = sortPlaces(PLACES.filter((p) => p.cat === "eat" && p.meal.includes(cur)));
     $("#tab-eat").innerHTML = `
       <div><p class="eyebrow">Spanish & Catalan heritage food</p><h1>Where we eat</h1></div>
+      <div class="card"><div class="kicker"><h2>Craving something?</h2><span class="small muted">Local specialties</span></div>
+        <div class="chips">${craveChips()}</div></div>
       <div class="seg" role="tablist">${tabs.map(([k, l]) => `<button role="tab" data-eat="${k}" aria-selected="${k === cur}">${l}</button>`).join("")}</div>
       <p class="small muted">${esc(tip)}</p>
       <p class="small muted">Sorted: open now first, then nearest to ${esc(origin().name)}.</p>
       <div class="list">${list.map((p) => placeCard(p)).join("")}</div>`;
     $$("#tab-eat [data-eat]").forEach((b) => b.addEventListener("click", () => { S.eat = b.dataset.eat; save(); renderEat(); }));
+    $$("#tab-eat [data-crave]").forEach((b) => b.addEventListener("click", () => craveSheet(b.dataset.crave)));
   }
 
   /* ---------------- SEE ---------------- */
