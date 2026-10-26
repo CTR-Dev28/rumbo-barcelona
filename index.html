@@ -302,6 +302,16 @@ ul.plain{margin:0;padding-left:18px;display:grid;gap:6px}
 .tag.good{color:var(--open);border-color:currentColor;background:transparent}
 .tag.warn{color:var(--closed);border-color:currentColor;background:transparent}
 .tag.kids{color:var(--ink)}
+/* Top 20 coffee rankings */
+ol.rk{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.rk li{display:flex;align-items:center;gap:12px;padding:8px 10px;border-radius:10px;min-width:0}
+.rk li:nth-child(odd){background:var(--surface-2)}
+.rk .rn{font-family:var(--f-display);font-weight:900;font-stretch:118%;font-size:18px;line-height:1;min-width:2ch;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+.rk .t{flex:1;min-width:0}
+.rk .t b{display:block;font-weight:650;font-size:14px;line-height:1.25}
+.rk .t small{display:block;font-size:12px;color:var(--muted)}
+.rk li.home{background:var(--info-bg);color:var(--info-ink)}
+.rk li.home .rn,.rk li.home .t small{color:var(--info-ink)}
 .tprice{display:grid;justify-items:end;line-height:1.15;flex:none;text-align:right}
 .tprice b{font-family:var(--f-display);font-weight:850;font-size:20px;font-variant-numeric:tabular-nums}
 .tprice small{font-size:11px;color:var(--muted);max-width:96px}
@@ -989,6 +999,27 @@ const ESPRESSO = [
   { id: "hidden", badge: "Own roastery", why: "El Born roaster buying from small farms; the coffee of the month is the one to try.", order: "Espresso, or the coffee of the month as a pour-over.", best: "Daily; a few steps from Santa Maria del Mar" },
   { id: "syra", badge: "Open daily", why: "Barcelona's own small-shop chain since 2015: consistent espresso, quick, and usually one nearby.", order: "Cortado or espresso to go.", best: "Daily 08:00–20:00" }
 ];
+
+/* ---------- COFFEE RANKINGS (Eat › Cafés › Top 20 lists, added 26 Oct 2026) ----------
+   Official lists: theworlds100bestcoffeeshops.com (World 2026, Europe 2026). Cities only where a source names them. */
+const COFFEE_RANKS = {
+  world: { name: "The World's 100 Best Coffee Shops 2026", when: "Announced 16 Feb 2026 · CoffeeFest Madrid", url: "https://theworlds100bestcoffeeshops.com/top-100-coffee-shops/",
+    note: "No. 1 in the world is Onyx Coffee Lab in Rogers, Arkansas. The list ranks whole coffee shops, not espresso alone.",
+    foot: "Barcelona: Nomad Frutas Selectas No. 16, D·Origen No. 83. Spain has two in the top 20, with Hola Coffee in Madrid at No. 19.",
+    list: [["Onyx Coffee Lab", "Rogers, Arkansas, USA"], ["Tim Wendelboe", "Oslo, Norway"], ["Alquimia Coffee", "El Salvador"], ["Only Coffee Project Crows Nest", "Sydney, Australia"],
+      ["Toby's Estate Coffee Roasters", "Sydney, Australia"], ["Apartment Coffee", "Singapore"], ["Gota Coffee Experts", "Vienna, Austria"], ["Story of Ono", "Malaysia"],
+      ["Tropicalia Coffee", "Colombia"], ["Tanat", "France"], ["FANKØR", "Ecuador"], ["Arcane Estate Coffee", "USA"], ["Beta Coffee", "Sydney, Australia"],
+      ["Nomadic Specialty Coffee", "Egypt"], ["Nemesis Coffee", "Canada"], ["Nomad Frutas Selectas", "Barcelona, Spain", "nomadpoblenou"], ["Kafi Wasi Café Tostaduría", "Peru"],
+      ["Benchmark Coffee", "UAE"], ["Hola Coffee Lagasca", "Madrid, Spain"], ["BlendIn Coffee Club", "Texas, USA"]] },
+  europe: { name: "Europe's 100 Best Coffee Shops 2026", when: "First edition · 25 Jun 2026 · World of Coffee Brussels", url: "https://theworlds100bestcoffeeshops.com/top-100-coffee-shops-europe/",
+    note: "No. 1 in Europe is Tim Wendelboe in Oslo, a café and roastery that is also No. 2 in the world.",
+    foot: "Barcelona: Nomad Frutas Selectas No. 3, D·Origen No. 24. Hola Coffee Roastery in Madrid is No. 8.",
+    list: [["Tim Wendelboe", "Oslo, Norway"], ["Gota Coffee Experts", "Vienna, Austria"], ["Nomad Frutas Selectas", "Barcelona, Spain", "nomadpoblenou"], ["Tanat", "France"],
+      ["Coffeewerk + Press", "Galway, Ireland"], ["Ottoman Coffee House", "Glasgow, UK"], ["Faro", "Italy"], ["Hola Coffee Roastery", "Madrid, Spain"], ["Meet LAB Coffee", "Turkey"],
+      ["La Cabra", "Denmark"], ["Bob Coffee Lab", "Bucharest, Romania"], ["Rosslyn Coffee", "London, UK"], ["7g Roaster", "Portugal"], ["Kross Coffee Roasters", "Greece"],
+      ["Birch Coffee", "Isle of Skye, UK"], ["Unfiltered Coffee", "Ireland"], ["Espresso Embassy", "Budapest, Hungary"], ["Moonstruck Café", "London, UK"],
+      ["Ditta Artigianale Specialty Coffee Roasters", "Italy"], ["MOK Coffee", "Belgium"]] }
+};
 
 const HOURS_PATCH = {
   viader: { hours: W("", "09:00-13:30,17:00-20:30", "09:00-13:30,17:00-20:30", "09:00-13:30,17:00-20:30", "09:00-13:30,17:00-20:30", "09:00-13:30,17:00-20:30", ""), hoursNote: "Closed Sunday and Monday." },
@@ -2009,11 +2040,11 @@ ${lines}`;
       breakfast: "Barcelona breakfasts are light: café amb llet with a croissant or pa amb tomàquet. Churros with thick chocolate are a treat. A mid-morning 'esmorzar de forquilla' (knife-and-fork breakfast) is the local habit.",
       lunch: "Lunch is the main meal, 13:30–16:00. Look for the weekday 'menú del dia' (starter, main, dessert, drink). Paella is a lunch dish here, not dinner.",
       dinner: "Locals dine from 20:30–21:00. Book the classics; tapas bars fill from 19:30. Many places close Sunday evening and Monday.",
-      cafe: "Ask for 'un cafè' (an espresso), a 'tallat' (cortado) or 'cafè amb llet'. Best espresso ranks the specialty bars; All cafés adds the historic cafés, open now first."
+      cafe: "Ask for 'un cafè' (an espresso), a 'tallat' (cortado) or 'cafè amb llet'. Best espresso ranks the specialty bars; Top 20 lists has the world and Europe rankings; All cafés adds the historic cafés."
     }[cur];
     const list = sortPlaces(PLACES.filter((p) => p.cat === "eat" && p.meal.includes(cur)));
-    const cafeView = cur === "cafe" ? (S.cafe === "all" ? "all" : "best") : "";
-    const cafeSeg = cafeView ? `<div class="chips" role="group" aria-label="Café view">${[["best", "Best espresso"], ["all", "All cafés"]].map(([k, l]) => `<button class="chip" data-cv="${k}" aria-pressed="${k === cafeView}">${l}</button>`).join("")}</div>` : "";
+    const cafeView = cur === "cafe" ? (["all", "rank"].includes(S.cafe) ? S.cafe : "best") : "";
+    const cafeSeg = cafeView ? `<div class="chips" role="group" aria-label="Café view">${[["best", "Best espresso"], ["rank", "Top 20 lists"], ["all", "All cafés"]].map(([k, l]) => `<button class="chip" data-cv="${k}" aria-pressed="${k === cafeView}">${l}</button>`).join("")}</div>` : "";
     $("#tab-eat").innerHTML = `
       <div><p class="eyebrow">Spanish & Catalan heritage food</p><h1>Where we eat</h1></div>
       <div class="card"><div class="kicker"><h2>Craving something?</h2><span class="small muted">Local specialties</span></div>
@@ -2021,9 +2052,10 @@ ${lines}`;
       <div class="seg" role="tablist">${tabs.map(([k, l]) => `<button role="tab" data-eat="${k}" aria-selected="${k === cur}">${l}</button>`).join("")}</div>
       <p class="small muted">${esc(tip)}</p>
       ${cafeSeg}
-      ${cafeView === "best" ? espressoHTML() : `<p class="small muted">Sorted: open now first, then nearest to ${esc(origin().name)}.</p>
+      ${cafeView === "best" ? espressoHTML() : cafeView === "rank" ? ranksHTML() : `<p class="small muted">Sorted: open now first, then nearest to ${esc(origin().name)}.</p>
       <div class="list">${list.map((p) => placeCard(p)).join("")}</div>`}`;
     $$("#tab-eat [data-cv]").forEach((b) => b.addEventListener("click", () => { S.cafe = b.dataset.cv; save(); renderEat(); }));
+    $$("#tab-eat [data-rk]").forEach((b) => b.addEventListener("click", () => { S.rk = b.dataset.rk; save(); renderEat(); }));
     $$("#tab-eat [data-detail]").forEach((b) => b.addEventListener("click", () => { const p = byId[b.dataset.detail]; if (p) openSheet(p.name, placeCard(p)); }));
     $$("#tab-eat [data-eat]").forEach((b) => b.addEventListener("click", () => { S.eat = b.dataset.eat; save(); renderEat(); }));
     $$("#tab-eat [data-crave]").forEach((b) => b.addEventListener("click", () => craveSheet(b.dataset.crave)));
@@ -2043,7 +2075,7 @@ ${lines}`;
         <div class="actions"><button class="btn taxi sm" data-ride="${p.id}">Take us there</button><button class="btn ghost sm" data-detail="${p.id}">Details & hours</button></div>
       </article>`;
     }).join("");
-    return `<p class="small muted">Ranked for espresso lovers from this year's World's and Europe's 100 Best Coffee Shops lists and specialist guides. Hours checked ${esc(ESPRESSO_CHECKED)}.</p>
+    return `<p class="small muted">Ranked for espresso lovers from this year's World's and Europe's 100 Best Coffee Shops lists and specialist guides. Hours checked ${esc(ESPRESSO_CHECKED)}. World and Europe rankings are under Top 20 lists.</p>
       <div class="list">${items}</div>
       <div class="card"><h3>Order like a local</h3><ul class="plain small">
         <li><b>Un cafè</b> or <b>cafè sol</b>: an espresso.</li>
@@ -2051,8 +2083,18 @@ ${lines}`;
         <li><b>Cafè amb llet</b>: the milky breakfast coffee.</li>
         <li>Beans to take home: Nomad, D·Origen, Right Side, or the historic roaster Cafès El Magnífico.</li></ul></div>`;
   }
+  function ranksHTML() {
+    const k = S.rk === "europe" ? "europe" : "world", R = COFFEE_RANKS[k];
+    const seg = `<div class="chips" role="group" aria-label="Ranking">${[["world", "World top 20"], ["europe", "Europe top 20"]].map(([v, l]) => `<button class="chip" data-rk="${v}" aria-pressed="${v === k}">${l}</button>`).join("")}</div>`;
+    const rows = R.list.map(([name, place, id], i) => `<li class="${id ? "home" : ""}"><span class="rn">${i + 1}</span><span class="t"><b>${esc(name)}</b><small>${esc(place)}</small></span>${id && byId[id] ? `<button class="btn ghost sm" data-detail="${id}">In Rumbo</button>` : ""}</li>`).join("");
+    return seg + `<div class="card"><div><p class="eyebrow">${esc(R.when)}</p><h3>${esc(R.name)}</h3></div>
+      <p class="small muted">${esc(R.note)}</p>
+      <ol class="rk">${rows}</ol>
+      <p class="small">${esc(R.foot)}</p>
+      <div class="actions"><a class="btn ghost sm" href="${esc(R.url)}" target="_blank" rel="noopener">Full top 100</a></div></div>`;
+  }
   function espressoCtx() {
-    return "BEST ESPRESSO & SPECIALTY COFFEE (ranked; use for any coffee question):\n" + ESPRESSO.filter((e) => byId[e.id]).map((e, i) => `${i + 1}. ${byId[e.id].name} (${e.badge}): ${e.why} Order: ${e.order} ${e.best}.`).join("\n");
+    return "BEST ESPRESSO & SPECIALTY COFFEE (ranked; use for any coffee question):\n" + ESPRESSO.filter((e) => byId[e.id]).map((e, i) => `${i + 1}. ${byId[e.id].name} (${e.badge}): ${e.why} Order: ${e.order} ${e.best}.`).join("\n") + "\n" + ["world", "europe"].map((k) => `${COFFEE_RANKS[k].name} (${COFFEE_RANKS[k].when}) top 20: ` + COFFEE_RANKS[k].list.map(([n, p], i) => `${i + 1}. ${n} (${p})`).join("; ")).join("\n");
   }
 
   /* ---------------- SEE ---------------- */
