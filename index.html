@@ -802,8 +802,19 @@ PLACES.push(
     how: "€60/day, €150 for 3 days, €220/week; pedals and helmet included if needed (bring your own pedals and shoes). Shop Mon–Fri 9:30–20:00, Sat 10:00–14:00. Tel +34 607 515 782.", phone: "+34 607 515 782", web: "https://roadcycling.barcelona/bike-rental",
     hours: ["", "09:30-20:00", "09:30-20:00", "09:30-20:00", "09:30-20:00", "09:30-20:00", "10:00-14:00"], tags: "road bike rental carbon gravel triathlon delivery" },
   { id: "velodrom", cat: "active", kind: "bikeshop", name: "Velodrom Barcelona", area: "Sant Gervasi, near Diagonal", addr: "Carrer del Comte de Salvatierra 6, Barcelona", lat: 41.3962, lng: 2.1550, metro: ["L3", "L5"], stop: "Diagonal / FGC Provença",
-    what: "Premium cycling store with coffee bar, workshop, dynamic bike fitting and road/gravel rental.",
-    how: "Check current hours on Maps before going; workshop by appointment.", web: "https://www.velodrom.cc/pages/velodrom-barcelona", hours: null, hoursText: "Check hours", tags: "bike shop workshop repair fitting road gravel rental coffee" },
+    what: "Premium cycling store with coffee bar, workshop, dynamic bike fitting and road/gravel rental. Sister shops in Girona: Velodrom Girona (Odeon) and the Velodrom Girona Workshop.",
+    how: "Mon–Fri 10:00–13:30 & 16:30–20:30, Sat 16:30–20:30, Sun closed (velodrom.cc). Workshop by appointment. Tel +34 937 682 373 · info@velodrom.cc.", phone: "+34 937 682 373", web: "https://www.velodrom.cc/pages/velodrom-barcelona",
+    hours: ["", "10:00-13:30,16:30-20:30", "10:00-13:30,16:30-20:30", "10:00-13:30,16:30-20:30", "10:00-13:30,16:30-20:30", "10:00-13:30,16:30-20:30", "16:30-20:30"], tags: "velodrom bike shop workshop repair fitting road gravel rental coffee barcelona" },
+  { id: "velodromgirona", cat: "active", kind: "bikeshop", name: "Velodrom Girona (Odeon)", area: "Girona old town · 40 min by fast train", addr: "Pujada de Sant Domènec 6, 17004 Girona", lat: 41.98486, lng: 2.82636, metro: ["R"], stop: "Girona station (Avant/AVE from Sants), then about 20 min walk", mode: "train", boost: 1,
+    trainHow: "Avant/AVE from Barcelona-Sants, about 38–40 min (book seats ahead); from Girona station walk about 20 min across the Onyar into the old town.",
+    what: "Velodrom's flagship in Girona, inside the restored 19th-century Odeon theatre by the Sant Martí steps: premium road and gravel kit, the La Maglia café, and the pickup point for Velodrom rental bikes.",
+    how: "Mon–Wed 10:30–13:30 & 16:30–20:30, Thu–Sat 10:30–20:30, Sun closed (velodrom.cc lists Thursday both ways). Rental from €85/day, 3 days €230–249, week €490–539, €500 card hold; book online, and you can return in Barcelona (one-way fee shown before paying). Sunday rental returns 10:00–17:00 at La Maglia café. girona@velodrom.cc · +34 872 001 688.", phone: "+34 872 001 688", web: "https://www.velodrom.cc/pages/bike-rental-girona",
+    hours: ["", "10:30-13:30,16:30-20:30", "10:30-13:30,16:30-20:30", "10:30-13:30,16:30-20:30", "10:30-20:30", "10:30-20:30", "10:30-20:30"], tags: "velodrom girona odeon bike shop rental road gravel coffee cafe la maglia day trip" },
+  { id: "velodromlab", cat: "active", kind: "bikeshop", name: "Velodrom Girona Workshop (Muc-Off Lab)", area: "Girona old town · 3 min walk from the Odeon", addr: "Carrer de l'Argenteria 9, 17004 Girona", lat: 41.98482, lng: 2.82448, metro: ["R"], stop: "Girona station (Avant/AVE from Sants), then about 15 min walk", mode: "train",
+    trainHow: "Avant/AVE from Barcelona-Sants, about 38–40 min (book seats ahead); from Girona station walk about 15 min to Carrer de l'Argenteria, by the Pont de Pedra.",
+    what: "Velodrom's Girona workshop, now the Muc-Off Performance Lab: servicing, tuning, tubeless set-ups and full overhauls, open to the street.",
+    how: "Mon–Fri 10:30–13:30 & 16:30–20:30, Sun closed; Saturday hours aren't listed, so call first. Tel +34 872 001 688 · girona@velodrom.cc.", phone: "+34 872 001 688", web: "https://www.velodrom.cc/pages/locations",
+    hours: ["", "10:30-13:30,16:30-20:30", "10:30-13:30,16:30-20:30", "10:30-13:30,16:30-20:30", "10:30-13:30,16:30-20:30", "10:30-13:30,16:30-20:30", ""], tags: "velodrom girona workshop repair service muc-off mechanic tubeless argenteria" },
   { id: "decathlon", cat: "active", kind: "bikeshop", name: "Decathlon Canuda", area: "By Plaça de Catalunya", addr: "Carrer de la Canuda 20, Barcelona", lat: 41.3845, lng: 2.1720, metro: ["L1", "L3"], stop: "Catalunya",
     what: "Running and cycling kit, tubes, pumps, gels, swim gear at everyday prices.", how: "Mon–Sat 9:30–21:30; closed Sunday. Tel +34 933 426 161.", phone: "+34 933 426 161",
     hours: ["", "09:30-21:30", "09:30-21:30", "09:30-21:30", "09:30-21:30", "09:30-21:30", "09:30-21:30"], tags: "sports shop running cycling gear tubes nutrition" },
@@ -1418,8 +1429,8 @@ const MINDMAPS = [{"id": "go", "title": "Getting around", "svg": "<svg xmlns=\"h
     const trip = p.kind === "trip" || p.mode === "train" || p.mode === "coach" || d > 25;
     const out = { d, road, trip, opts: [], best: null };
     if (trip) {
-      out.opts.push({ k: "transit", ic: p.mode === "coach" ? "bus" : "train", cls: "bg-teal", title: p.mode === "coach" ? "Coach" : "Train", sub: p.how || p.stop, href: gdir(p, "transit"), price: "See timetable" });
-      out.opts.push({ k: "tour", ic: "compass", cls: "bg-violet", title: "Organised day tour", sub: "Easiest with children: pick-up in the city, transport included.", href: "https://www.google.com/search?q=" + encodeURIComponent(p.name + " day tour from Barcelona"), price: "€€" });
+      out.opts.push({ k: "transit", ic: p.mode === "coach" ? "bus" : "train", cls: "bg-teal", title: p.mode === "coach" ? "Coach" : "Train", sub: p.trainHow || p.how || p.stop, href: gdir(p, "transit"), price: "See timetable" });
+      if (p.kind !== "bikeshop") out.opts.push({ k: "tour", ic: "compass", cls: "bg-violet", title: "Organised day tour", sub: "Easiest with children: pick-up in the city, transport included.", href: "https://www.google.com/search?q=" + encodeURIComponent(p.name + " day tour from Barcelona"), price: "€€" });
       out.best = "transit";
       return out;
     }
@@ -1847,7 +1858,7 @@ const MINDMAPS = [{"id": "go", "title": "Getting around", "svg": "<svg xmlns=\"h
     raw = raw.trim();
     if (raw.length < 2) { box.innerHTML = ""; return; }
     const words = norm(raw).split(/\s+/).filter((w) => w.length > 2 && !["the", "and", "for", "near", "with", "best", "where", "what", "how", "our", "can"].includes(w));
-    let hits = PLACES.map((p) => ({ p, s: score(p, words, raw) + (norm(p.name).includes(norm(raw)) ? 10 : 0) })).filter((x) => x.s > 3)
+    let hits = PLACES.map((p) => ({ p, s: score(p, words, raw) + (norm(p.name).includes(norm(raw)) ? 10 : 0) + (p.boost || 0) })).filter((x) => x.s > 3)
       .sort((a, b) => b.s - a.s || km(origin(), a.p) - km(origin(), b.p)).slice(0, 6);
     const rhits = ROUTES.filter((r) => words.some((w) => norm(r.name + " " + r.what).includes(w)) || (/run|jog|exercise|workout/i.test(raw) && r.sport !== "ride") || (/ride|cycl|bike/i.test(raw) && r.sport !== "run")).slice(0, 3);
     let extra = "", cards = "";
@@ -1886,7 +1897,7 @@ const MINDMAPS = [{"id": "go", "title": "Getting around", "svg": "<svg xmlns=\"h
     const lines = PLACES.map((p) => {
       const st = status(p, t);
       const kind = p.cat === "eat" ? "food:" + p.meal.join("/") : p.cat === "see" ? (p.kind === "trip" ? "day trip" : p.kind === "family" ? "family attraction" : "sight") : p.kind === "pharmacy" ? "24h pharmacy" : p.cat === "help" ? p.kind : p.kind === "tech" ? "electronics/Apple" : p.kind === "luxury" ? "designer/luxury" : p.cat === "shop" ? "shop" : "bike shop/rental";
-      return `- ${p.name} [${kind}] ${p.area || ""}; ${p.addr || ""}; transit: ${(p.metro || []).join("/")} ${p.stop || ""}; now: ${st.text}; today: ${todayHours(p, t)}; ${p.order || p.what || ""} ${p.how || ""} ${p.tip || ""}`.replace(/\s+/g, " ").slice(0, 330);
+      return `- ${p.name} [${kind}${/Girona/.test(p.addr || "") && p.kind !== "trip" ? ", in GIRONA not Barcelona" : ""}] ${p.area || ""}; ${p.addr || ""}; transit: ${(p.metro || []).join("/")} ${p.stop || ""}; now: ${st.text}; today: ${todayHours(p, t)}; ${p.order || p.what || ""} ${p.how || ""} ${p.tip || ""}`.replace(/\s+/g, " ").slice(0, 330);
     }).join("\n");
     const routes = ROUTES.map((r) => `- ${r.name} (${r.sport}): ${r.km}, ${r.gain}, ${r.surface}. Start ${r.startName}. ${r.tip}`).join("\n");
     const fx = FIXTURES.map((f) => `- ${niceDate(f.date)} ${f.time}: ${f.home} v ${f.away} (${f.comp}, ${f.venue})`).join("\n");
